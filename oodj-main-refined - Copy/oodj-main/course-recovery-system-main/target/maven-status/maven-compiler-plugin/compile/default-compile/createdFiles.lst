@@ -16,7 +16,6 @@ edu\apu\crs\notification\NotificationService$1.class
 edu\apu\crs\service\EligibilityService.class
 edu\apu\crs\dataIO\CourseFileReader.class
 edu\apu\crs\courserecovery\CourseRecoveryDashboard$4.class
-edu\apu\crs\usermanagement\User.class
 edu\apu\crs\service\StudentDataService.class
 edu\apu\crs\models\CourseRecoveryPlan.class
 edu\apu\crs\dataIO\SystemUserFileReader.class
@@ -35,4 +34,3 @@ edu\apu\crs\courserecovery\CourseRecoveryDashboard.class
 edu\apu\crs\dataIO\StudentFileReader.class
 edu\apu\crs\courserecovery\CourseRecoveryDashboard$5.class
 edu\apu\crs\service\PdfService.class
-edu\apu\crs\usermanagement\ChangePassword$1.class

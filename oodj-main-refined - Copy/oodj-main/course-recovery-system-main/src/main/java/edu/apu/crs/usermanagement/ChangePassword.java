@@ -1,115 +1,137 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.apu.crs.usermanagement;
-import javax.swing.*;
-import java.awt.*;
-import jakarta.mail.*;
-import jakarta.mail.internet.*;
-import java.util.Properties;
 
+import javax.swing.*;
+import edu.apu.crs.models.SystemUser;
+import edu.apu.crs.notification.NotificationService;
 import java.util.Random;
+import java.awt.*;
 
 /**
- *
- * @author acer
+ * Handles password reset flow with email verification.
  */
 public class ChangePassword extends JFrame {
     private UserManager manager;
-
-    private String generatedCode = null;   // The verification code
+    private NotificationService notificationService;
+    private String generatedCode = null;
+    private String emailForCode = null; // Store which email the code was sent to
 
     public ChangePassword(UserManager manager) {
         this.manager = manager;
+        this.notificationService = new NotificationService();
 
         setTitle("Reset Password");
-        setSize(430, 380);
+        setSize(450, 420);
         setResizable(false);
         setLayout(null);
         getContentPane().setBackground(new Color(25, 25, 25));
 
         JLabel title = new JLabel("Reset Password");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
         title.setForeground(Color.WHITE);
-        title.setBounds(150, 20, 200, 30);
+        title.setBounds(140, 20, 200, 30);
+        title.setHorizontalAlignment(SwingConstants.CENTER);
         add(title);
 
+        // --- Email Section ---
         JLabel emailLbl = new JLabel("Email:");
         emailLbl.setForeground(Color.WHITE);
-        emailLbl.setBounds(60, 70, 150, 20);
+        emailLbl.setBounds(50, 70, 150, 20);
         add(emailLbl);
 
         JTextField emailTxt = new JTextField();
-        emailTxt.setBounds(60, 90, 300, 30);
+        emailTxt.setBounds(50, 90, 330, 30);
         add(emailTxt);
 
-        JButton sendBtn = new JButton("Send Code");
-        sendBtn.setBounds(60, 130, 300, 30);
+        JButton sendBtn = new JButton("Send Verification Code");
+        sendBtn.setBounds(50, 130, 330, 30);
+        sendBtn.setBackground(new Color(70, 130, 180));
+        sendBtn.setForeground(Color.WHITE);
         add(sendBtn);
 
-        JLabel codeLbl = new JLabel("Reset Code:");
+        // --- Verification Section ---
+        JLabel codeLbl = new JLabel("Enter Code:");
         codeLbl.setForeground(Color.WHITE);
-        codeLbl.setBounds(60, 170, 150, 20);
+        codeLbl.setBounds(50, 180, 150, 20);
         add(codeLbl);
 
         JTextField codeTxt = new JTextField();
-        codeTxt.setBounds(60, 190, 300, 30);
+        codeTxt.setBounds(50, 200, 330, 30);
         add(codeTxt);
 
+        // --- New Password Section ---
         JLabel newLbl = new JLabel("New Password:");
         newLbl.setForeground(Color.WHITE);
-        newLbl.setBounds(60, 220, 150, 20);
+        newLbl.setBounds(50, 240, 150, 20);
         add(newLbl);
 
         JPasswordField newPass = new JPasswordField();
-        newPass.setBounds(60, 240, 300, 30);
+        newPass.setBounds(50, 260, 330, 30);
         add(newPass);
 
         JButton updateBtn = new JButton("Update Password");
-        updateBtn.setBounds(60, 275, 300, 30);
+        updateBtn.setBounds(50, 310, 330, 40);
+        updateBtn.setBackground(new Color(34, 139, 34));
+        updateBtn.setForeground(Color.WHITE);
         add(updateBtn);
 
-        // send email
+        // --- Action Listeners ---
         sendBtn.addActionListener(e -> {
             String email = emailTxt.getText().trim();
+            if (email.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter your email.");
+                return;
+            }
 
             // Check if email exists
             boolean exists = false;
-            for (User u : manager.getUsers()) {
+            for (SystemUser u : manager.getUsers()) {
                 if (u.getEmail().equalsIgnoreCase(email)) {
                     exists = true;
                     break;
                 }
             }
+
             if (!exists) {
-                JOptionPane.showMessageDialog(this, "Email not found!");
+                JOptionPane.showMessageDialog(this, "Email not found in system!");
                 return;
             }
 
+
             // Generate 6 digit code
             generatedCode = String.format("%06d", new Random().nextInt(999999));
+            emailForCode = email;
 
             try {
-                sendEmail(email, generatedCode);
-                JOptionPane.showMessageDialog(this, "Reset code sent to email!");
+                notificationService.sendPasswordResetCode(email, generatedCode);
+                JOptionPane.showMessageDialog(this, "Verification code sent to " + email + ".\nPlease check your inbox.");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Failed to send email: " + ex.getMessage());
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to send email. Check logs.");
             }
         });
 
-        //Update password
         updateBtn.addActionListener(e -> {
-            String email = emailTxt.getText();
+            String email = emailTxt.getText().trim();
             String code = codeTxt.getText().trim();
             String newP = new String(newPass.getPassword());
 
-            if (generatedCode == null) {
-                JOptionPane.showMessageDialog(this, "Please request a reset code first.");
+            if (generatedCode == null || emailForCode == null) {
+                JOptionPane.showMessageDialog(this, "Please request a verification code first.");
+                return;
+            }
+
+            if (!email.equalsIgnoreCase(emailForCode)) {
+                JOptionPane.showMessageDialog(this, "Email changed. Please resend code for the new email.");
                 return;
             }
 
             if (!generatedCode.equals(code)) {
-                JOptionPane.showMessageDialog(this, "Invalid reset code.");
+                JOptionPane.showMessageDialog(this, "Invalid verification code.");
+                return;
+            }
+
+            if (newP.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Password cannot be empty.");
                 return;
             }
 
@@ -117,43 +139,14 @@ public class ChangePassword extends JFrame {
             boolean ok = manager.resetPassword(email, newP);
 
             if (ok) {
-                JOptionPane.showMessageDialog(this, "Password updated!");
+                JOptionPane.showMessageDialog(this, "Password updated successfully!\nPlease login with your new password.");
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Something went wrong.");
+                JOptionPane.showMessageDialog(this, "Error updating password. User may not exist or file error.");
             }
         });
 
         setLocationRelativeTo(null);
         setVisible(true);
-    }
-
-    // Send email 
-    private void sendEmail(String to, String code) throws Exception {
-        String host = "smtp.gmail.com";
-        final String username = "courserecoverysystem.apu@gmail.com";
-        final String appPassword = "sunztfhrmdxsqffn"; // App password
-
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", "587");
-
-       Session session = Session.getInstance(props, new Authenticator() {
-    @Override
-    protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication(username, appPassword);
-    }
-});
-
-
-        Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress(username));
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-        msg.setSubject("Your Password Reset Code");
-        msg.setText("Your reset code is: " + code);
-
-        Transport.send(msg);
     }
 }

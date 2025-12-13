@@ -38,6 +38,10 @@ public class SystemUserFileReader extends BaseDataReader<SystemUser> {
                 String email = parts[2].trim();
                 String password = parts[3].trim();
                 String role = parts[4].trim();
+                boolean isActive = true; // Default
+                if (parts.length >= 6) {
+                    isActive = Boolean.parseBoolean(parts[5].trim());
+                }
 
                 SystemUser user = null;
 
@@ -45,11 +49,12 @@ public class SystemUserFileReader extends BaseDataReader<SystemUser> {
                 switch (role) {
 
                     case "Academic Officer":
-                        user = new AcademicOfficer(userID, username, email, password, role, true);
+                        user = new AcademicOfficer(userID, username, email, password, role, isActive);
                         break;
 
                     case "Course Admin":
-                        user = new CourseAdministrator(userID, username, email, password, role, true);
+                    case "Course Administrator": // Handle both variations just in case
+                        user = new CourseAdministrator(userID, username, email, password, "Course Admin", isActive);
                         break;
 
                     default:

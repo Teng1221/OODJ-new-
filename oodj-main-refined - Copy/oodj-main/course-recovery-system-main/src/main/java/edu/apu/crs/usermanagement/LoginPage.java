@@ -10,18 +10,16 @@ import java.awt.*;
 import javax.swing.border.EmptyBorder;
 import edu.apu.crs.usermanagement.UserManager;
 import edu.apu.crs.usermanagement.UserLogin;
-import edu.apu.crs.notification.NotificationService;
+
 
 public class LoginPage extends JFrame {
 
     private SystemUserService userService;
     private UserManager userManager;
-    private NotificationService notificationService;
 
     public LoginPage() {
         this.userService = new SystemUserService();
         this.userManager = new UserManager();
-        this.notificationService = new NotificationService();
         setTitle("Login to Course Recovery System");
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,31 +115,7 @@ public class LoginPage extends JFrame {
 
         // --- Forgot Password Action ---
         forgotPassButton.addActionListener(e -> {
-            String email = JOptionPane.showInputDialog(null, "Enter your registered email to reset password:");
-
-            if (email == null) {
-                return;
-            }
-
-            // 2. Check if user submitted an empty email (returns empty string)
-            if (email.trim().isEmpty()) {
-
-                JOptionPane.showMessageDialog(null, "Email field cannot be empty. Please enter your email.", "Warning",
-                        JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // 3. Find user and process
-            SystemUser user = userService.findUserByEmail(email.trim());
-            if (user != null) {
-                notificationService.sendPasswordResetRequest(user.getEmail(), "http://localhost:8080/reset-password?token=dummy-token");
-                JOptionPane.showMessageDialog(null, "Password recovery link sent to " + user.getEmail());
-            } else {
-                JOptionPane.showMessageDialog(null, "The entered email was not found in the system.", "Error",
-                        JOptionPane.WARNING_MESSAGE);
-            }
-
-             
+            new ChangePassword(userManager).setVisible(true);
         });
     }
 }

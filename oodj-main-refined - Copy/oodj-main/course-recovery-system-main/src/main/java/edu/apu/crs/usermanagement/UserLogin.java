@@ -9,6 +9,8 @@ import java.awt.event.*;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 
+import edu.apu.crs.models.SystemUser;
+
 /**
  *
  * @author acer
@@ -77,7 +79,7 @@ public class UserLogin extends JFrame {
             String email = emailField.getText().trim();
             String pass = new String(passwordField.getPassword());
 
-            User u = manager.authenticate(email, pass);
+            SystemUser u = manager.authenticate(email, pass);
 
             if (u == null) {
                 JOptionPane.showMessageDialog(this, "Invalid login or inactive account!");

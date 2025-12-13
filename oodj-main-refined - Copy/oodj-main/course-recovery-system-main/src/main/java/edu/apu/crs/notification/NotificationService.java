@@ -93,6 +93,12 @@ public class NotificationService {
             "Your CRS password has been successfully changed.");
     }
 
+    public void sendPasswordResetCode(String email, String code) {
+        sendEmail(email, "Your Password Reset Code",
+            "Your password reset verification code is: " + code + 
+            "\n\nPlease enter this code in the application to reset your password.");
+    }
+
     // ===============================
     // 🔹 Course Recovery (Action Plan)
     // ===============================
