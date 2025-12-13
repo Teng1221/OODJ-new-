@@ -1,6 +1,8 @@
 edu\apu\crs\dataIO\ScoreFileReader.class
 edu\apu\crs\dataIO\BaseDataReader.class
 edu\apu\crs\models\SystemUser.class
+edu\apu\crs\usermanagement\AdminDashboard.class
+edu\apu\crs\usermanagement\ChangePassword.class
 edu\apu\crs\models\CourseAdministrator.class
 edu\apu\crs\App.class
 edu\apu\crs\notification\NotificationService.class
@@ -14,6 +16,7 @@ edu\apu\crs\notification\NotificationService$1.class
 edu\apu\crs\service\EligibilityService.class
 edu\apu\crs\dataIO\CourseFileReader.class
 edu\apu\crs\courserecovery\CourseRecoveryDashboard$4.class
+edu\apu\crs\usermanagement\User.class
 edu\apu\crs\service\StudentDataService.class
 edu\apu\crs\models\CourseRecoveryPlan.class
 edu\apu\crs\dataIO\SystemUserFileReader.class
@@ -24,6 +27,12 @@ edu\apu\crs\service\SystemUserService.class
 edu\apu\crs\dataIO\ProgramFileReader.class
 edu\apu\crs\models\Student.class
 edu\apu\crs\models\AcademicOfficer.class
+edu\apu\crs\courserecovery\CourseRecoveryDashboard$6.class
+edu\apu\crs\usermanagement\UserManager.class
+edu\apu\crs\usermanagement\UserLogin.class
 edu\apu\crs\courserecovery\CourseRecoveryDashboard$3.class
 edu\apu\crs\courserecovery\CourseRecoveryDashboard.class
 edu\apu\crs\dataIO\StudentFileReader.class
+edu\apu\crs\courserecovery\CourseRecoveryDashboard$5.class
+edu\apu\crs\service\PdfService.class
+edu\apu\crs\usermanagement\ChangePassword$1.class
