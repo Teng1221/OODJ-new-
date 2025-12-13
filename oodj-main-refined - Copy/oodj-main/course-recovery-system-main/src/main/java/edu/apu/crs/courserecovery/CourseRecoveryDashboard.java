@@ -331,17 +331,20 @@ public class CourseRecoveryDashboard extends JFrame {
 
         List<Student> processed = masterDataService.getAllProcessedStudents();
         List<Student> needRecovery = new ArrayList<>();
+
         for (Student s : processed) {
-            // Updated Logic: Only show students who are actually enrolled in a plan
-            if (courseRecoveryService.isStudentEnrolled(s.getStudentId())) {
+            boolean isEligible = (s.getCurrentCGPA() >= 2.0 && s.getFailedCourseCount() <= 3);
+            if (!isEligible) {
                 needRecovery.add(s);
             }
         }
+
         needRecovery.sort(Comparator.comparing(Student::getStudentId));
 
         studentCombo.removeAllItems();
-        for (Student s : needRecovery)
+        for (Student s : needRecovery) {
             studentCombo.addItem(s);
+        }
 
         studentCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
