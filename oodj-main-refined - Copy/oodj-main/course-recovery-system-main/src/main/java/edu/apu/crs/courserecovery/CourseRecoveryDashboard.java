@@ -8,6 +8,9 @@ import edu.apu.crs.service.MasterDataService;
 import edu.apu.crs.service.CourseRecoveryService;
 import edu.apu.crs.models.SystemUser;
 import edu.apu.crs.notification.NotificationService;
+import edu.apu.crs.usermanagement.AdminDashboard;
+import edu.apu.crs.usermanagement.UserManager;
+
 // import edu.apu.crs.service.EligibilityService;
 
 import javax.swing.*;
@@ -92,7 +95,9 @@ public class CourseRecoveryDashboard extends JFrame {
 
         if (role.equalsIgnoreCase("Course Administrator")
                 || role.equalsIgnoreCase("Course Admin")) {
-            addButton(menuPanel, "User Management", "USER_MANAGE");
+                    dispose();
+                    edu.apu.crs.usermanagement.UserManager userManager = new edu.apu.crs.usermanagement.UserManager();
+                    new AdminDashboard(userManager, currentUser.getEmail());
         }
 
         JButton logoutBtn = new JButton("Logout");

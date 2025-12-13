@@ -1,14 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.apu.crs.usermanagement;
 import javax.swing.*;
 import java.awt.*;
-/**
- *
- * @author acer
- */
+
 public class AdminDashboard extends JFrame {
 
     private UserManager manager;
@@ -102,9 +95,8 @@ public class AdminDashboard extends JFrame {
 
         // LOGOUT
         logout.addActionListener(e -> {
-            manager.logLogout(adminEmail);
-            new UserLogin(manager);
             dispose();
+            new LoginPage().setVisible(true);
         });
 
         setLocationRelativeTo(null);

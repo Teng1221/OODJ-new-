@@ -8,8 +8,8 @@ import java.awt.*;
 // import java.awt.event.ActionEvent;
 // import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
-import edu.apu.crs.usermanagement.UserLogin;
 import edu.apu.crs.usermanagement.UserManager;
+import edu.apu.crs.usermanagement.UserLogin;
 
 public class LoginPage extends JFrame {
 
@@ -20,7 +20,7 @@ public class LoginPage extends JFrame {
         this.userService = new SystemUserService();
         this.userManager = new UserManager();
         setTitle("Login to Course Recovery System");
-        setSize(500, 250);
+        setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -66,13 +66,11 @@ public class LoginPage extends JFrame {
         // --- Row 3: Buttons
         JButton loginButton = new JButton("Login");
         JButton forgotPassButton = new JButton("Forgot Password");
-        JButton adminButton = new JButton("Admin Login");
 
         // Use a sub-panel for horizontal button alignment
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.add(loginButton);
         buttonPanel.add(forgotPassButton);
-        buttonPanel.add(adminButton);   
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -84,10 +82,6 @@ public class LoginPage extends JFrame {
 
         add(panel);
 
-        adminButton.addActionListener(e -> {
-            dispose();
-            new UserLogin(userManager).setVisible(true);
-        });
 
         // --- Login Action ---
         loginButton.addActionListener(e -> {
@@ -103,9 +97,15 @@ public class LoginPage extends JFrame {
             SystemUser user = userService.login(input, password);
 
             if (user != null) {
-                JOptionPane.showMessageDialog(null, "Login successful!\nWelcome, " + user.getRoleTitle());
-                dispose();
-                new CourseRecoveryDashboard(user).setVisible(true);
+                if (user.getRole().equals("Course Admin")) {
+                    JOptionPane.showMessageDialog(null, "Login successful!\nWelcome, " + user.getRoleTitle());
+                    dispose();
+                    new AdminDashboard(userManager, user.getEmail());
+                } else {
+                    JOptionPane.showMessageDialog(null, "Login successful!\nWelcome, " + user.getRoleTitle());
+                    dispose();
+                    new CourseRecoveryDashboard(user).setVisible(true);
+                }
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid username/UserID or password.", "Login Failed",
                         JOptionPane.ERROR_MESSAGE);
