@@ -8,16 +8,19 @@ import java.awt.*;
 // import java.awt.event.ActionEvent;
 // import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
+import edu.apu.crs.usermanagement.UserLogin;
+import edu.apu.crs.usermanagement.UserManager;
 
 public class LoginPage extends JFrame {
 
     private SystemUserService userService;
+    private UserManager userManager;
 
     public LoginPage() {
         this.userService = new SystemUserService();
-
+        this.userManager = new UserManager();
         setTitle("Login to Course Recovery System");
-        setSize(400, 250);
+        setSize(500, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -63,11 +66,13 @@ public class LoginPage extends JFrame {
         // --- Row 3: Buttons
         JButton loginButton = new JButton("Login");
         JButton forgotPassButton = new JButton("Forgot Password");
+        JButton adminButton = new JButton("Admin Login");
 
         // Use a sub-panel for horizontal button alignment
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.add(loginButton);
         buttonPanel.add(forgotPassButton);
+        buttonPanel.add(adminButton);   
 
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -76,7 +81,13 @@ public class LoginPage extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(buttonPanel, gbc);
 
+
         add(panel);
+
+        adminButton.addActionListener(e -> {
+            dispose();
+            new UserLogin(userManager).setVisible(true);
+        });
 
         // --- Login Action ---
         loginButton.addActionListener(e -> {

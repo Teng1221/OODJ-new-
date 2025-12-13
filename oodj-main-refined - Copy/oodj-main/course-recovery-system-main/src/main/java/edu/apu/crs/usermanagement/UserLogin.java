@@ -24,7 +24,7 @@ public class UserLogin extends JFrame {
         this.manager = manager;
 
         setTitle("Login");
-        setSize(430, 400);
+        setSize(460, 400);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
@@ -66,6 +66,12 @@ public class UserLogin extends JFrame {
         forgotBtn.setForeground(Color.WHITE);
         add(forgotBtn);
 
+        JButton backBtn = new JButton("Back to User Login");
+        backBtn.setBounds(60, 350, 300, 30);
+        backBtn.setBackground(Color.GRAY);
+        backBtn.setForeground(Color.WHITE);
+        add(backBtn);
+
         // LOGIN 
         loginBtn.addActionListener(e -> {
             String email = emailField.getText().trim();
@@ -87,6 +93,11 @@ public class UserLogin extends JFrame {
         });
 
         forgotBtn.addActionListener(e -> new ChangePassword(manager));
+
+        backBtn.addActionListener(e -> {
+            dispose();
+            new LoginPage().setVisible(true);
+        });
 
         setLocationRelativeTo(null);
         setVisible(true);
