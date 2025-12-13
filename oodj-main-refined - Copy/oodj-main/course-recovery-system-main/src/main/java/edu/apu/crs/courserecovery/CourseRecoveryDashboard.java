@@ -345,7 +345,7 @@ public class CourseRecoveryDashboard extends JFrame {
         for (Student s : needRecovery) {
             studentCombo.addItem(s);
         }
-
+        
         studentCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,
