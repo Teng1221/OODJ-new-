@@ -26,9 +26,9 @@ public class PdfService {
     public String generateStudentReport(Student student, int year, int semester, List<Score> scores, double cgpa,
             Map<String, Course> courseMap) {
         String filename = "Academic_Report_" + student.getStudentId() + "_Y" + year + "S" + semester + ".pdf";
-        String dest = "reports/" + filename;
+        String dest = "StuAcademicReport/" + filename;
 
-        File directory = new File("reports");
+        File directory = new File("StuAcademicReport");
         if (!directory.exists()) {
             directory.mkdirs();
         }
