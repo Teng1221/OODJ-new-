@@ -8,9 +8,6 @@ import edu.apu.crs.service.MasterDataService;
 import edu.apu.crs.service.CourseRecoveryService;
 import edu.apu.crs.models.SystemUser;
 import edu.apu.crs.notification.NotificationService;
-import edu.apu.crs.usermanagement.AdminDashboard;
-import edu.apu.crs.usermanagement.UserManager;
-
 // import edu.apu.crs.service.EligibilityService;
 
 import javax.swing.*;
@@ -95,9 +92,7 @@ public class CourseRecoveryDashboard extends JFrame {
 
         if (role.equalsIgnoreCase("Course Administrator")
                 || role.equalsIgnoreCase("Course Admin")) {
-                    dispose();
-                    edu.apu.crs.usermanagement.UserManager userManager = new edu.apu.crs.usermanagement.UserManager();
-                    new AdminDashboard(userManager, currentUser.getEmail());
+            addButton(menuPanel, "User Management", "USER_MANAGE");
         }
 
         JButton logoutBtn = new JButton("Logout");
@@ -350,7 +345,7 @@ public class CourseRecoveryDashboard extends JFrame {
         for (Student s : needRecovery) {
             studentCombo.addItem(s);
         }
-        
+
         studentCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -493,7 +488,7 @@ public class CourseRecoveryDashboard extends JFrame {
 
         // --- Table & Result ---
         DefaultTableModel reportModel = new DefaultTableModel(
-                new String[] { "Sem", "Course Code", "Course Title", "Credits", "Grade", "Point" }, 0) {
+                new String[] { "Sem", "Course Code", "Course Name", "Total Credit Hour", "Grade", "Point" }, 0) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
@@ -587,7 +582,8 @@ public class CourseRecoveryDashboard extends JFrame {
 
             if (totalCredits > 0) {
                 displayedCgpa[0] = totalPoints / totalCredits;
-                cgpaLabel.setText(String.format("GPA/CGPA: %.2f", displayedCgpa[0]));
+                cgpaLabel.setText(
+                        String.format("Total Credit Hour: %d | GPA/CGPA: %.2f", totalCredits, displayedCgpa[0]));
             } else {
                 cgpaLabel.setText("GPA/CGPA: 0.00");
             }
@@ -631,9 +627,9 @@ public class CourseRecoveryDashboard extends JFrame {
             body.append("Academic Report for ").append(s.getStudentName()).append("\n");
             body.append("Year: ").append(yearCombo.getSelectedItem()).append(", Sem: ")
                     .append(semCombo.getSelectedItem()).append("\n\n");
-            body.append(String.format("%-4s %-10s %-30s %-8s %-5s %-5s\n", "Sem", "Code", "Title", "Credits", "Grade",
-                    "Point"));
-            body.append("----------------------------------------------------------------\n");
+            body.append(String.format("%-4s %-10s %-30s %-8s %-5s %-5s\n", "Sem", "Code", "Name", "Total Credit Hour",
+                    "Grade", "Point"));
+            body.append("----------------------------------------------------------------------\n");
 
             Map<String, Course> courseMap = new HashMap<>();
             for (Course c : courseRecoveryService.getAllCourses())
@@ -651,7 +647,14 @@ public class CourseRecoveryDashboard extends JFrame {
                 body.append(String.format("%-4d %-10s %-30s %-8d %-5s %-5.2f\n",
                         v.getsemester(), v.getcourseId(), title, credits, v.getgrade(), v.getgradePoint()));
             }
-            body.append("\nGPA: ").append(String.format("%.2f", displayedCgpa[0]));
+            // Calculate total credits for email
+            int totalCreditsEmail = displayedScores.stream().mapToInt(sc -> {
+                Course c = courseMap.get(sc.getcourseId());
+                return (c != null) ? c.getCredits() : 0;
+            }).sum();
+
+            body.append("\nTotal Credit Hour: ").append(totalCreditsEmail).append("\n");
+            body.append("GPA: ").append(String.format("%.2f", displayedCgpa[0]));
 
             notificationService.sendSemesterReport(s.getEmail(), s.getStudentName(), body.toString());
             JOptionPane.showMessageDialog(this, "Email sent to " + s.getEmail());
