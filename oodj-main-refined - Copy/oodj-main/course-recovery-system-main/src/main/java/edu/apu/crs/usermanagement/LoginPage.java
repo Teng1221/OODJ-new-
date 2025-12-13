@@ -10,15 +10,18 @@ import java.awt.*;
 import javax.swing.border.EmptyBorder;
 import edu.apu.crs.usermanagement.UserManager;
 import edu.apu.crs.usermanagement.UserLogin;
+import edu.apu.crs.notification.NotificationService;
 
 public class LoginPage extends JFrame {
 
     private SystemUserService userService;
     private UserManager userManager;
+    private NotificationService notificationService;
 
     public LoginPage() {
         this.userService = new SystemUserService();
         this.userManager = new UserManager();
+        this.notificationService = new NotificationService();
         setTitle("Login to Course Recovery System");
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -131,15 +134,14 @@ public class LoginPage extends JFrame {
             // 3. Find user and process
             SystemUser user = userService.findUserByEmail(email.trim());
             if (user != null) {
-
-                // NotificationService.sendPasswordResetRequest here (Requirement 5.0)
-                JOptionPane.showMessageDialog(null,
-                        "Password recovery link sent to: " + user.getEmail(),
-                        "Email Sent", JOptionPane.INFORMATION_MESSAGE);
+                notificationService.sendPasswordResetRequest(user.getEmail(), "http://localhost:8080/reset-password?token=dummy-token");
+                JOptionPane.showMessageDialog(null, "Password recovery link sent to " + user.getEmail());
             } else {
                 JOptionPane.showMessageDialog(null, "The entered email was not found in the system.", "Error",
                         JOptionPane.WARNING_MESSAGE);
             }
+
+             
         });
     }
 }
