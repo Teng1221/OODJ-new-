@@ -18,6 +18,6 @@ U017,DrMichelle Chan,michelle.chan@university.edu,michelle123,Course Admin,true
 U018,MrAaron Koh,aaron.koh@university.edu,aaron123,Course Admin,true
 U019,DrRebecca Wong,rebecca.wong@university.edu,rebecca123,Course Admin,true
 U020,MsFiona Tay,fiona.tay@university.edu,fiona123,Course Admin,true
-U021,MrJohn Doe,thamkingjoe9@gmail.com,B@sketball123256,Course Admin,true
-U022,Ben,tp072535@mail.apu.edu.my,Happy123,Course Admin,true
+U021,MrJohn Doe,thamkingjoe9@gmail.com,Happy123,Course Admin,true
+U022,Ben,tp072535@mail.apu.edu.my,Happy123256,Course Admin,true
 U023,ava,ayak34261@gmail.com,admin123,Academic Officer,true

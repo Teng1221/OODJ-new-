@@ -1,6 +1,7 @@
 package edu.apu.crs.usermanagement;
 
 import edu.apu.crs.models.SystemUser;
+import edu.apu.crs.notification.NotificationService;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -11,21 +12,24 @@ public class AdminDashboard extends JFrame {
     private JList<String> userList; // Display strings, or custom renderer
     private DefaultListModel<String> listModel;
     private String adminEmail;
+    private NotificationService notificationService;
 
     public AdminDashboard(UserManager manager, String adminEmail) {
         this.manager = manager;
         this.adminEmail = adminEmail;
+        this.notificationService = new NotificationService();
 
         setTitle("Admin Dashboard");
-        setSize(500, 500);
+        setSize(1000, 600);
         setResizable(false);
         setLayout(null);
         getContentPane().setBackground(new Color(25, 25, 25));
 
         JLabel title = new JLabel("User Manager");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        title.setFont(new Font("Arial", Font.BOLD, 24));
         title.setForeground(Color.WHITE);
-        title.setBounds(180, 20, 200, 30);
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBounds(0, 20, 1000, 30);
         add(title);
 
         // List Model
@@ -33,23 +37,33 @@ public class AdminDashboard extends JFrame {
         refreshList();
 
         userList = new JList<>(listModel);
-        userList.setBounds(40, 70, 400, 250);
-        add(userList);
+        // Wrapped in JScrollPane
+        JScrollPane scrollPane = new JScrollPane(userList);
+        scrollPane.setBounds(40, 70, 920, 400); // Centered and wider
+        add(scrollPane);
 
+        // Buttons - Centered Row
+        int btnY = 500;
+        int h = 35;
+        
         JButton activate = new JButton("Activate");
-        activate.setBounds(40, 340, 120, 30);
+        activate.setBounds(40, btnY, 160, h);
         add(activate);
 
         JButton deactivate = new JButton("Deactivate");
-        deactivate.setBounds(180, 340, 120, 30);
+        deactivate.setBounds(210, btnY, 160, h);
         add(deactivate);
 
         JButton addUser = new JButton("Add User");
-        addUser.setBounds(320, 340, 120, 30);
+        addUser.setBounds(380, btnY, 160, h);
         add(addUser);
 
+        JButton manageCredentials = new JButton("Manage Credentials");
+        manageCredentials.setBounds(550, btnY, 240, h); 
+        add(manageCredentials);
+
         JButton logout = new JButton("Logout");
-        logout.setBounds(180, 390, 120, 30);
+        logout.setBounds(800, btnY, 160, h);
         add(logout);
 
         // ACTIVATE USER
@@ -115,6 +129,29 @@ public class AdminDashboard extends JFrame {
                 refreshList();
             } else {
                 JOptionPane.showMessageDialog(this, "User email already exists!");
+            }
+        });
+
+        // MANAGE CREDENTIALS
+        manageCredentials.addActionListener(e -> {
+            String selected = userList.getSelectedValue();
+            if (selected == null) {
+                JOptionPane.showMessageDialog(this, "Select a user first!");
+                return;
+            }
+
+            String[] parts = selected.split("\\|");
+            if (parts.length < 3) return;
+            String email = parts[2].trim();
+
+            String newPass = JOptionPane.showInputDialog(this, "Enter New Password for " + email + ":");
+            if (newPass == null || newPass.trim().isEmpty()) return;
+
+            if (manager.resetPassword(email, newPass)) {
+                notificationService.sendPasswordChanged(email); // Send Email
+                JOptionPane.showMessageDialog(this, "Password reset successfully! Email notification sent.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to reset password (user not found).");
             }
         });
 
