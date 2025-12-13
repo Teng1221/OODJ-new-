@@ -19,7 +19,7 @@ P005,S025,C011,2,Completed,gyf
 P005,S025,C011,3,PASS,NA
 P006,S036,C007,1,Completed,hi
 P006,S036,C007,2,Not Started,lmao
-P006,S036,C007,3,Not Started,NA
+P006,S036,C007,3,Not Started,yo
 P007,S036,C010,1,Not Started,NA
 P007,S036,C010,2,Not Started,NA
 P007,S036,C010,3,Not Started,NA
@@ -38,3 +38,4 @@ P013,S095,C009,1,Not Started,NA
 P014,S095,C026,1,Not Started,NA
 P015,S095,C032,1,Not Started,NA
 P016,S036,C012,1,Not Started,NA
+P006,S036,C007,4,Not Started,bruh

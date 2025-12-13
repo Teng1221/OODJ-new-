@@ -129,4 +129,12 @@ public class NotificationService {
             + reportSummary + 
             "\n\nKeep up the good work!");
     }
+
+    public void sendRecoveryUpdate(String email, String courseName, String updateType, String details) {
+        sendEmail(email, "Recovery Plan Update: " + courseName,
+            "There has been an update to your recovery plan for course: " + courseName + 
+            "\nAction: " + updateType + 
+            "\nDetails: " + details + 
+            "\n\nPlease check your dashboard for more information.");
+    }
 }

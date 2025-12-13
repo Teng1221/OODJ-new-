@@ -427,7 +427,27 @@ public class CourseRecoveryDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, "Please select a row first.");
                 return;
             }
-            milestoneTableModel.setValueAt("", row, 3);
+            int week = Integer.parseInt(milestoneTableModel.getValueAt(row, 0).toString());
+            
+            // Set empty recommendation
+            courseRecoveryService.updateRecommendation(currentPlanId, 
+                ((Course)courseCombo.getSelectedItem()).getCourseId(), 
+                week, "NA");
+            courseRecoveryService.saveRecoveryPlans();
+
+            loadPlanForSelectedCourse(); // reload UI
+
+            // EMAIL NOTIFICATION
+            Student s = (Student) studentCombo.getSelectedItem();
+            Course c = (Course) courseCombo.getSelectedItem();
+            if (s != null && c != null) {
+                notificationService.sendRecoveryUpdate(
+                    s.getEmail(), 
+                    c.getCourseName(), 
+                    "Recommendation Removed", 
+                    "Recommendation for Week " + week + " has been removed."
+                );
+            }
         });
 
         saveBtn.addActionListener(e -> {
@@ -794,6 +814,16 @@ public class CourseRecoveryDashboard extends JFrame {
         // ✅ loop 外面才 save（一次就好）
         courseRecoveryService.saveRecoveryPlans();
         JOptionPane.showMessageDialog(this, "Saved!");
+
+        // EMAIL NOTIFICATION
+        if (s != null && currentPlanId != null) {
+            notificationService.sendRecoveryUpdate(
+                s.getEmail(), 
+                c.getCourseName(), 
+                "Plan/Recommendation Update", 
+                "Your recovery plan status or recommendations have been updated. Please check your dashboard."
+            );
+        }
     }
 
     private String sanitizeForCsv(String text) {
@@ -838,7 +868,15 @@ public class CourseRecoveryDashboard extends JFrame {
 
         loadPlanForSelectedCourse(); // reload table
 
-        // TODO: Email notification hook
+        // EMAIL NOTIFICATION
+        if (s != null) {
+            notificationService.sendRecoveryUpdate(
+                s.getEmail(), 
+                c.getCourseName(), 
+                "Milestone Added", 
+                "New Milestone for Week " + week + ": " + task.trim()
+            );
+        }
     }
 
     private void updateMilestoneAction() {
@@ -868,7 +906,16 @@ public class CourseRecoveryDashboard extends JFrame {
 
         loadPlanForSelectedCourse();
 
-        // TODO: Email notification hook
+        // EMAIL NOTIFICATION
+        Student s = (Student) studentCombo.getSelectedItem();
+        if (s != null) {
+            notificationService.sendRecoveryUpdate(
+                s.getEmail(), 
+                c.getCourseName(), 
+                "Milestone Updated", 
+                "Week " + week + " task updated to: " + newTask.trim()
+            );
+        }
     }
 
     private void removeMilestoneAction() {
@@ -903,6 +950,14 @@ public class CourseRecoveryDashboard extends JFrame {
 
         loadPlanForSelectedCourse();
 
-        // TODO: Email notification hook
+        // EMAIL NOTIFICATION
+        if (s != null) {
+            notificationService.sendRecoveryUpdate(
+                s.getEmail(), 
+                c.getCourseName(), 
+                "Milestone Removed", 
+                "Milestone for Week " + week + " has been removed."
+            );
+        }
     }
 }
