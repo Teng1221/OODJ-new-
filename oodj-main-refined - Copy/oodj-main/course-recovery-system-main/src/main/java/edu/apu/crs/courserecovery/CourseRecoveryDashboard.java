@@ -160,7 +160,6 @@ public class CourseRecoveryDashboard extends JFrame {
         contentPanel.add(toolbar, BorderLayout.NORTH);
         //
 
-        // --- Table ---
         eligibilityModel = new DefaultTableModel(
                 new String[] { "Student ID", "Name", "CGPA", "Failed Courses", "Status" }, 0) {
             @Override
@@ -177,7 +176,7 @@ public class CourseRecoveryDashboard extends JFrame {
         // Add Content to Main
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // --- Logic & Listeners ---
+        // Logic & Listeners 
         filterAndLoadData(); // Initial load
 
         // Filter Action
@@ -429,13 +428,12 @@ public class CourseRecoveryDashboard extends JFrame {
             }
             int week = Integer.parseInt(milestoneTableModel.getValueAt(row, 0).toString());
             
-            // Set empty recommendation
             courseRecoveryService.updateRecommendation(currentPlanId, 
                 ((Course)courseCombo.getSelectedItem()).getCourseId(), 
                 week, "NA");
             courseRecoveryService.saveRecoveryPlans();
 
-            loadPlanForSelectedCourse(); // reload UI
+            loadPlanForSelectedCourse(); 
 
             // EMAIL NOTIFICATION
             Student s = (Student) studentCombo.getSelectedItem();
