@@ -8,7 +8,6 @@ import edu.apu.crs.models.Score;
 import edu.apu.crs.models.Student;
 
 import java.io.*;
-//import java.net.URL;
 import java.util.*;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -46,7 +45,7 @@ public class CourseRecoveryService {
         loadCustomMilestones();
     }
 
-    /* ===================== 1. LOAD TXT FILES ===================== */
+    // 1. LOAD TXT FILES 
 
     private void loadCourses() {
         courses.clear();
@@ -99,7 +98,6 @@ public class CourseRecoveryService {
     private void loadStudents() {
         students.clear();
         for (String[] parts : readCsv(STUDENT_LIST_FILE)) {
-            // stuList: studentId, name, email, programId, programName, currentSemester
             if (parts.length < 6)
                 continue;
 
@@ -117,7 +115,6 @@ public class CourseRecoveryService {
     private void loadScores() {
         scores.clear();
         for (String[] parts : readCsv(SCORE_FILE)) {
-            // stuScore: S001,C003,0,1,70,72,3.3,B+,PASS
             if (parts.length < 9)
                 continue;
 
@@ -127,9 +124,9 @@ public class CourseRecoveryService {
             int semester = parseIntSafe(parts[3]);
             int assignmentScore = parseIntSafe(parts[4]);
             int examScore = parseIntSafe(parts[5]);
-            double gradePoint = parseDoubleSafe(parts[6]); // 3.3
-            String grade = parts[7].trim(); // B+
-            String status = parts[8].trim(); // PASS / FAIL
+            double gradePoint = parseDoubleSafe(parts[6]); 
+            String grade = parts[7].trim(); 
+            String status = parts[8].trim(); 
 
             Score score = new Score(
                     studentId,
@@ -150,7 +147,6 @@ public class CourseRecoveryService {
             }
         }
 
-        // 计算每个学生有多少门 FAIL
         for (Student s : students.values()) {
             int failed = (int) s.getScores().stream()
                     .filter(sc -> "FAIL".equalsIgnoreCase(sc.getstatus()))
@@ -162,7 +158,6 @@ public class CourseRecoveryService {
     private void loadMilestones() {
         milestones.clear();
         for (String[] parts : readCsv(MILESTONE_FILE)) {
-            // CR001,C001,1,Review database notes
             if (parts.length < 4)
                 continue;
 
@@ -179,7 +174,7 @@ public class CourseRecoveryService {
     private void loadRecoveryPlans() {
         recoveryPlans.clear();
 
-        for (String[] parts : readCsv(RECOVERY_PLAN_FILE)) { // RECOVERY_PLAN_FILE = "data/courseRecoveryPlan.txt"
+        for (String[] parts : readCsv(RECOVERY_PLAN_FILE)) { 
             if (parts.length < 5)
                 continue;
 
@@ -194,7 +189,7 @@ public class CourseRecoveryService {
         }
     }
 
-    /* ===================== 2. QUERY METHODS ===================== */
+    // 2. QUERY METHODS 
 
     public List<Student> getStudentsWithFailedCourses() {
         List<Student> result = new ArrayList<>();
@@ -213,7 +208,6 @@ public class CourseRecoveryService {
         if (stu == null)
             return result;
 
-        // key = courseId, value = latest Score (max attempt)
         Map<String, Score> latestByCourse = new HashMap<>();
         for (Score sc : stu.getScores()) {
             String cid = sc.getcourseId();
@@ -223,7 +217,6 @@ public class CourseRecoveryService {
             }
         }
 
-        // only keep those whose latest is FAIL
         for (Map.Entry<String, Score> e : latestByCourse.entrySet()) {
             if ("FAIL".equalsIgnoreCase(e.getValue().getstatus())) {
                 Course c = courses.get(e.getKey());
@@ -247,11 +240,6 @@ public class CourseRecoveryService {
         return result;
     }
 
-    /**
-     * 原本就有：拿到某学生某课程的 plan（如果没有就创建）
-     * ⚠️ 注意：你的 txt 是 per-week 一行，所以这个方法只会返回其中一行（通常是第一个匹配到的 week）。
-     * UI 如果要拿完整 weeks，请用下面新增的 getRecoveryPlanEntries(...)
-     */
     public CourseRecoveryPlan getOrCreateRecoveryPlan(String studentId, String courseId) {
         for (CourseRecoveryPlan plan : recoveryPlans) {
             if (studentId.equals(plan.getStudentId())
@@ -272,9 +260,6 @@ public class CourseRecoveryService {
         return newPlan;
     }
 
-    /* ===================== ✅ 新增：给 Recovery Panel 用 ===================== */
-
-    // 1) 取某学生某课程的所有 week plan entries（按 week 排序）
     public List<CourseRecoveryPlan> getRecoveryPlanEntries(String studentId, String courseId) {
         List<CourseRecoveryPlan> result = new ArrayList<>();
         for (CourseRecoveryPlan p : recoveryPlans) {
@@ -286,7 +271,6 @@ public class CourseRecoveryService {
         return result;
     }
 
-    // 2) 确保某 planId + studentId + courseId + week 存在（没有就创建一行）
     public CourseRecoveryPlan getOrCreatePlanWeek(String planId, String studentId, String courseId, int week) {
         for (CourseRecoveryPlan p : recoveryPlans) {
             if (planId.equals(p.getPlanId())
@@ -311,12 +295,8 @@ public class CourseRecoveryService {
         return false;
     }
 
-    /* ===================== 3. UPDATE METHODS ===================== */
+    // 3. UPDATE METHODS 
 
-    /**
-     * ✅ 修正：之前你只更新 overall status，现在按 week 更新（符合 courseRecoveryPlan.txt 的 per-week
-     * 结构）
-     */
     public void updateMilestoneStatus(String planId, String courseId, int week, String newStatus) {
         for (CourseRecoveryPlan plan : recoveryPlans) {
             if (planId.equals(plan.getPlanId())
@@ -328,17 +308,10 @@ public class CourseRecoveryService {
         }
     }
 
-    /**
-     * 你原本的：按 planId 更新 recommendation（保留，不影响旧调用）
-     */
     public void addRecommendation(String planId, String text) {
         updateRecommendation(planId, text);
     }
 
-    /**
-     * 你原本的：按 planId 更新 recommendation（保留）
-     * ⚠️ 但你现在 txt 结构是 per-week，所以建议 UI 用下面 overload (planId, courseId, week, text)
-     */
     public void updateRecommendation(String planId, String newText) {
         for (CourseRecoveryPlan plan : recoveryPlans) {
             if (planId.equals(plan.getPlanId())) {
@@ -348,9 +321,6 @@ public class CourseRecoveryService {
         }
     }
 
-    /**
-     * ✅ 新增：按 week 更新 recommendation（给 Recovery Panel 用）
-     */
     public void updateRecommendation(String planId, String courseId, int week, String newText) {
         for (CourseRecoveryPlan plan : recoveryPlans) {
             if (planId.equals(plan.getPlanId())
@@ -371,7 +341,7 @@ public class CourseRecoveryService {
         }
     }
 
-    /* ===================== 4. SAVE BACK TO TXT ===================== */
+    // 4. SAVE BACK TO TXT 
 
     public void saveRecoveryPlans() {
         List<String> lines = new ArrayList<>();
@@ -384,7 +354,7 @@ public class CourseRecoveryService {
                     (plan.getRecommendation() == null ? "NA" : plan.getRecommendation());
             lines.add(line);
         }
-        writeLines(RECOVERY_PLAN_FILE, lines); // RECOVERY_PLAN_FILE = "data/courseRecoveryPlan.txt"
+        writeLines(RECOVERY_PLAN_FILE, lines); 
     }
 
     public void updateScoreForRecovery(String studentId, String courseId, double newGradePoint) {
@@ -411,7 +381,6 @@ public class CourseRecoveryService {
     }
 
     private void saveScores() {
-        // ✅ 1) 去重：同一个 student+course 只保留 attempt 最大的那条
         Map<String, Score> latestMap = new LinkedHashMap<>();
         for (Score s : scores) {
             String key = s.getstudentId() + "|" + s.getcourseId();
@@ -421,11 +390,9 @@ public class CourseRecoveryService {
             }
         }
 
-        // ✅ 2) 用去重后的结果覆盖 scores（避免下次越存越多）
         scores.clear();
         scores.addAll(latestMap.values());
 
-        // ✅ 3) 写回 txt（现在就只会写 1 行）
         List<String> lines = new ArrayList<>();
         for (Score s : scores) {
             StringBuilder sb = new StringBuilder();
@@ -443,7 +410,6 @@ public class CourseRecoveryService {
         writeLines(SCORE_FILE, lines);
     }
 
-    /* ===================== Helper Methods ===================== */
 
     private List<String[]> readCsv(String resourcePath) {
         List<String[]> rows = new ArrayList<>();
@@ -466,13 +432,11 @@ public class CourseRecoveryService {
     private static final String PROJECT_RESOURCE_ROOT = "src/main/resources/";
 
     private BufferedReader openReader(String resourcePath) throws IOException {
-        // ✅ 优先读项目里的真实文件（会保留你 save 的内容）
         File f = new File(PROJECT_RESOURCE_ROOT + resourcePath);
         if (f.exists()) {
             return new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
         }
 
-        // fallback: 读 jar/classpath（打包后才会用到）
         InputStream is = getClass().getClassLoader().getResourceAsStream(resourcePath);
         if (is == null)
             throw new FileNotFoundException("Resource not found: " + resourcePath);
@@ -580,10 +544,8 @@ public class CourseRecoveryService {
     }
 
     public List<Milestone> getMilestonesForPlan(String planId, String courseId) {
-        // base template
         List<Milestone> base = getMilestonesForCourse(courseId);
 
-        // overrides/additions
         Map<Integer, String> override = new HashMap<>();
         for (String[] p : customMilestones) {
             if (p.length < 4)
@@ -601,7 +563,6 @@ public class CourseRecoveryService {
             merged.put(w, new Milestone("TEMPLATE", courseId, w, task));
         }
 
-        // add new weeks (custom only)
         for (Map.Entry<Integer, String> e : override.entrySet()) {
             if (!merged.containsKey(e.getKey())) {
                 merged.put(e.getKey(), new Milestone("CUSTOM", courseId, e.getKey(), e.getValue()));
@@ -613,7 +574,6 @@ public class CourseRecoveryService {
         return result;
     }
 
-    // 删除某个 plan week entry（courseRecoveryPlan.txt 那行）
     public void removePlanWeek(String planId, String studentId, String courseId, int week) {
         recoveryPlans.removeIf(p -> planId.equals(p.getPlanId()) &&
                 studentId.equals(p.getStudentId()) &&
@@ -643,7 +603,6 @@ public class CourseRecoveryService {
                                                                 : "F";
 
         if (latest == null) {
-            // 如果真的找不到原本记录，才新增（很少发生）
             int semester = 1;
             Score created = new Score(studentId, courseId, nextAttempt, semester, 0, 0, grade, newGradePoint, passFail);
             scores.add(created);
@@ -653,15 +612,12 @@ public class CourseRecoveryService {
                 stu.addScore(created);
 
         } else {
-            // ✅ 重点：直接改原本那条，不要新增
             latest.setattempt(nextAttempt);
             latest.setgradePoint(newGradePoint);
             latest.setgrade(grade);
             latest.setstatus(passFail);
-            // 如果你有 recovery exam score，也可以 setexamScore(...)
         }
 
-        // 更新 failed count + 写回 txt
         Student stu = students.get(studentId);
         if (stu != null) {
             int failed = (int) stu.getScores().stream()
