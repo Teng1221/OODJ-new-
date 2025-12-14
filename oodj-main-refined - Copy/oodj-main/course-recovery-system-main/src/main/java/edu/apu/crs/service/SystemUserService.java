@@ -3,9 +3,9 @@ package edu.apu.crs.service;
 import edu.apu.crs.models.AcademicOfficer;
 import edu.apu.crs.models.CourseAdministrator;
 import edu.apu.crs.models.SystemUser;
-import edu.apu.crs.dataIO.SystemUserFileReader; // Imports the new I/O class
+import edu.apu.crs.dataIO.SystemUserFileReader; 
 import java.io.DataOutputStream; // For binary logging (Phase III, Step 10)
-import java.io.FileOutputStream; // For binary logging (Phase III, Step 10)
+import java.io.FileOutputStream; 
 import java.io.IOException;
 //import java.util.ArrayList;
 import java.util.Date;
@@ -13,14 +13,14 @@ import java.util.List;
 
 public class SystemUserService {
 
-    // List holds the abstract class SystemUser (Polymorphism)
+    // List holds the abstract class SystemUser 
     private List<SystemUser> users;
 
-    // Path for binary logging file (Phase III, Step 10)
+    // Path for binary logging file 
     private static final String LOG_FILE = "logs/login_timestamps.dat";
 
     public SystemUserService() {
-        // REFACTOR: Remove ALL hardcoded users and load from file instead
+        // Remove ALL hardcoded users and load from file instead
         System.out.println("Loading System Users from file...");
         this.users = SystemUserFileReader.readAllUsers();
         System.out.println("Loaded " + this.users.size() + " system users.");
@@ -40,18 +40,13 @@ public class SystemUserService {
         return null;
     }
 
-    /**
-     * Logs the logout timestamp to a binary file. (Phase III, Step 10)
-     *
-     * @param username The username logging out.
-     */
+    // Logs the logout timestamp to a binary file. (Phase III, Step 10)
+
     public void logout(String username) {
         logTimestamp(username, false); // Log logout
     }
 
-    /**
-     * Private helper method to log timestamps to a binary file (Requirement 1.1.2)
-     */
+    // Private helper method to log timestamps to a binary file 
     private void logTimestamp(String username, boolean isLogin) {
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(LOG_FILE, true))) {
             long timestamp = new Date().getTime();
@@ -65,17 +60,10 @@ public class SystemUserService {
         }
     }
 
-    /**
-     * Adds a new SystemUser to the system, instantiating the correct subclass.
-     * 
-     * @param username New user's username.
-     * @param password New user's password.
-     * @param role     User's role (e.g., "Academic Officer" or "Course Admin").
-     * @param active   Initial active status.
-     */
+    // Adds a new SystemUser to the system, instantiating the correct subclass.
+
     public void addUser(String userID, String username, String email, String password, String role, boolean active) {
-        // Use the role string to determine which subclass to instantiate (Inheritance &
-        // Polymorphism)
+
         SystemUser newUser = null;
         String normalizedRole = role.toLowerCase().replace(" ", "");
         switch (normalizedRole) {
@@ -101,12 +89,6 @@ public class SystemUserService {
         return users.removeIf(u -> u.getUsername().equalsIgnoreCase(username));
     }
 
-    /**
-     * Finds a SystemUser by username.
-     * 
-     * @param username The username to search for.
-     * @return The SystemUser object, or null if not found.
-     */
     public SystemUser findUser(String username) {
         for (SystemUser u : users) {
             if (u.getUsername().equalsIgnoreCase(username)) {
