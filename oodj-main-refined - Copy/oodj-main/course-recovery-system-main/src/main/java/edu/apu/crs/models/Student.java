@@ -92,14 +92,7 @@ public class Student {
     }
 
 
-    /// wan teng look thisssssss
-    
-    /**
-     * Retrieves a map of failed courses (CourseID -> CourseName) for this student.
-     * This relies on having the Course Name data available elsewhere (e.g., in the GUI or another service).
-     * For now, we return a map of CourseID to a dummy name.
-     * @return Map of CourseID to status ("FAIL").
-     */
+   
     public Map<String, String> getFailedCourseCodes() {
         return this.scores.stream()
             .filter(score -> "FAIL".equalsIgnoreCase(score.getstatus()))
