@@ -15,6 +15,5 @@ public class CourseAdministrator extends SystemUser {
         return "Course Administrator";
     }
 
-    // can add methods specific to a Course Administrator here (e.g.,
-    // manageRecoveryPlans())
+    
 }
