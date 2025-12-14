@@ -8,7 +8,6 @@ import edu.apu.crs.service.MasterDataService;
 import edu.apu.crs.service.CourseRecoveryService;
 import edu.apu.crs.models.SystemUser;
 import edu.apu.crs.notification.NotificationService;
-// import edu.apu.crs.service.EligibilityService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -135,7 +134,7 @@ public class CourseRecoveryDashboard extends JFrame {
         // FIX 1: Added missing semicolon below
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // tool bar (filter and search ui )
+        // filter and search ui
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
 
         toolbar.add(new JLabel("Filter:"));
@@ -207,7 +206,7 @@ public class CourseRecoveryDashboard extends JFrame {
                 return;
             }
 
-            // Validation: Ensure no "Eligible" students are selected
+            // Ensure no Eligible students are selected
             for (int row : selectedRows) {
                 String status = (String) eligibilityModel.getValueAt(row, 4); // Column 4 is Status
                 if ("Eligible".equalsIgnoreCase(status)) {
@@ -260,7 +259,7 @@ public class CourseRecoveryDashboard extends JFrame {
         return mainPanel;
     }
 
-    // --- Data Logic: Filter ---
+    // Filter 
     private void filterAndLoadData() {
         eligibilityModel.setRowCount(0);
         List<Student> allStudents = masterDataService.getAllProcessedStudents();
@@ -287,7 +286,7 @@ public class CourseRecoveryDashboard extends JFrame {
         }
     }
 
-    // --- Data Logic: Search ---
+    // Search 
     private void searchStudentData(String studentId) {
         // 1. Clear Table
         eligibilityModel.setRowCount(0);
@@ -309,7 +308,7 @@ public class CourseRecoveryDashboard extends JFrame {
             // Optionally reload data so table isn't empty
             filterAndLoadData();
         }
-    } // FIX 2: Added missing closing brace here
+    } // Added missing closing brace here
 
     // 2. RECOVERY PANEL
     private JPanel buildRecoveryPanel() {
@@ -467,7 +466,7 @@ public class CourseRecoveryDashboard extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.add(createHeaderPanel("Academic Reports"), BorderLayout.NORTH);
 
-        // --- Controls ---
+        // Controls
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
         // Student Selection
@@ -502,9 +501,9 @@ public class CourseRecoveryDashboard extends JFrame {
         JButton previewBtn = new JButton("Preview");
         controls.add(previewBtn);
 
-        panel.add(controls, BorderLayout.CENTER); // Will move this to NORTH wrapper
+        panel.add(controls, BorderLayout.CENTER); // will move it to north
 
-        // --- Table & Result ---
+        // Table & Result
         DefaultTableModel reportModel = new DefaultTableModel(
                 new String[] { "Sem", "Course Code", "Course Name", "Total Credit Hour", "Grade", "Point" }, 0) {
             @Override
@@ -527,7 +526,7 @@ public class CourseRecoveryDashboard extends JFrame {
         contentWrapper.add(controls, BorderLayout.NORTH);
         contentWrapper.add(centerPanel, BorderLayout.CENTER);
 
-        // --- Footer Actions ---
+        // Footer Actions 
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton pdfBtn = new JButton("Export to PDF");
         JButton emailBtn = new JButton("Email to Student");
@@ -541,7 +540,7 @@ public class CourseRecoveryDashboard extends JFrame {
         final java.util.List<Score> displayedScores = new ArrayList<>();
         final double[] displayedCgpa = { 0.0 };
 
-        // --- Listeners ---
+        // Listeners
         previewBtn.addActionListener(e -> {
             reportModel.setRowCount(0);
             displayedScores.clear();
@@ -555,7 +554,7 @@ public class CourseRecoveryDashboard extends JFrame {
             int year = (Integer) yearCombo.getSelectedItem();
             String semStr = (String) semCombo.getSelectedItem();
 
-            // Map Year/Sem to absolute semester (1-4)
+            // Map Year/Sem to absolute semester 
             // Y1S1=1, Y1S2=2, Y2S1=3, Y2S2=4
             List<Integer> targetSemesters = new ArrayList<>();
             if ("All".equals(semStr)) {
@@ -785,17 +784,14 @@ public class CourseRecoveryDashboard extends JFrame {
             if (newRec.isBlank())
                 newRec = "NA";
 
-            // ✅ 先拿旧的 planWeek(为了比较 oldStatus)
             CourseRecoveryPlan planWeek = courseRecoveryService.getOrCreatePlanWeek(currentPlanId, s.getStudentId(),
                     c.getCourseId(), week);
 
             String oldStatus = planWeek.getStatus();
 
-            // ✅ 1) 写回 plan(status + recommendation)
             courseRecoveryService.updateMilestoneStatus(currentPlanId, c.getCourseId(), week, newStatus);
             courseRecoveryService.updateRecommendation(currentPlanId, c.getCourseId(), week, newRec);
 
-            // ✅ 2) 只有 Exam 行 + status 有变化 + 且是 Pass/Failed 才更新成绩 & attempt+1
             boolean isPassFail = "PASS".equalsIgnoreCase(newStatus) || "FAIL".equalsIgnoreCase(newStatus);
 
             if (isExamRow && isPassFail) {
@@ -809,7 +805,6 @@ public class CourseRecoveryDashboard extends JFrame {
             }
         }
 
-        // ✅ loop 外面才 save（一次就好）
         courseRecoveryService.saveRecoveryPlans();
         JOptionPane.showMessageDialog(this, "Saved!");
 
@@ -866,7 +861,6 @@ public class CourseRecoveryDashboard extends JFrame {
 
         loadPlanForSelectedCourse(); // reload table
 
-        // EMAIL NOTIFICATION
         if (s != null) {
             notificationService.sendRecoveryUpdate(
                 s.getEmail(), 
@@ -904,7 +898,6 @@ public class CourseRecoveryDashboard extends JFrame {
 
         loadPlanForSelectedCourse();
 
-        // EMAIL NOTIFICATION
         Student s = (Student) studentCombo.getSelectedItem();
         if (s != null) {
             notificationService.sendRecoveryUpdate(
@@ -948,7 +941,6 @@ public class CourseRecoveryDashboard extends JFrame {
 
         loadPlanForSelectedCourse();
 
-        // EMAIL NOTIFICATION
         if (s != null) {
             notificationService.sendRecoveryUpdate(
                 s.getEmail(), 
