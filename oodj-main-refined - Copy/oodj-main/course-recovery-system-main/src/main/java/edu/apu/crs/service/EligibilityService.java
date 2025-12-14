@@ -22,14 +22,10 @@ public class EligibilityService {
 
 
 
-    // --- Main Calculation Methods ---
+    // Main Calculation Methods 
 
-    /**
-     * Calculates the CGPA for a student based on their scores.
-     *
-     * @param scores List of all scores for a student.
-     * @return Calculated CGPA.
-     */
+    // Calculates the CGPA for a student based on their scores.
+     
     public double calculateCGPA(List<Score> scores) {
         double totalGradePointsXCredits = 0.0;
         int totalCreditHours = 0;
@@ -50,15 +46,12 @@ public class EligibilityService {
             return 0.0;
         }
         
-        // Return rounded CGPA (in 2 decimal )
+        // Return rounded CGPA 
         return Math.round((totalGradePointsXCredits / totalCreditHours) * 100.0) / 100.0;
     }
 
-    /**
-     * Counts the number of distinct failed courses for a student.
-     * @param scores List of all scores for a student.
-     * @return Count of failed courses.
-     */
+    // Counts the number of distinct failed courses for a student.
+ 
     public int countFailedCourses(List<Score> scores) {
         // Filters scores where status is FAIL and counts them
         return (int) scores.stream()
@@ -68,13 +61,8 @@ public class EligibilityService {
 
 
 
-    // --- Eligibility Decision Methods ---
+    // Eligibility Decision Methods 
 
-    /**
-     * @param cgpa Calculated CGPA.
-     * @param failedCourseCount Count of courses marked as FAIL.
-     * @return true if eligible, false otherwise.
-     */
     public boolean isEligibleToProgress(double cgpa, int failedCourseCount) {
 
         // Criteria 1: At least CGPA 2.0
@@ -86,10 +74,8 @@ public class EligibilityService {
         return meetsCgpa && meetsFailLimit;
     }
 
-    /**
-     * Processes all students, calculates their eligibility, and updates the student objects.
-     * @param students List of all aggregated student objects.
-     */
+    // Processes all students, calculates their eligibility, and updates the student objects.
+     
     public void processAllStudentEligibility(List<Student> students) {
         for (Student student : students) {
 
@@ -103,12 +89,8 @@ public class EligibilityService {
         }
     }
 
-    /**
-     * Gets a list of students who are ineligible to progress or have failed courses
-     * and therefore need a recovery plan.
-     * @param allStudents The master list of Student objects.
-     * @return List of Student objects requiring intervention.
-     */
+    // Gets a list of students who are ineligible to progress or have failed courses
+
     public List<Student> getStudentsNeedingRecovery(List<Student> allStudents) {
         return allStudents.stream()
             .filter(student -> !isEligibleToProgress(
