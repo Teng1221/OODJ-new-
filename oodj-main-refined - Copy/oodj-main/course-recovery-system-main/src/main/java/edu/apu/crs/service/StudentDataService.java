@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 // This service is responsible for aggregating raw data into usable Student objects
-// (Aggregation)
 
 public class StudentDataService {
 
