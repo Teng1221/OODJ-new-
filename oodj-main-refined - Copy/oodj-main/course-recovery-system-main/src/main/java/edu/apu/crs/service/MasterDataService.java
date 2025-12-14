@@ -14,14 +14,14 @@ public class MasterDataService {
     public MasterDataService() {
         System.out.println("Initializing Master Data Service...");
 
-        // 1. Load static Course data (needed for credits/CGPA)
+        // Load static Course data 
         List<Course> allCourses = CourseFileReader.readCourses();
         
-        // 2. Initialize Services
+        // Initialize Services
         this.eligibilityService = new EligibilityService(allCourses);
         this.studentDataService = new StudentDataService();
         
-        // 3. Load and Process Students
+        // Load and Process Students
         List<Student> allStudents = studentDataService.getAllStudents();
         eligibilityService.processAllStudentEligibility(allStudents);
         
